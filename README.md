@@ -19,3 +19,5 @@ $ make run
 # Atatch to the container
 $ make exec
 ```
+
+![profile](./images/ss_profile.png)
