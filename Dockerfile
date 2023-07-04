@@ -77,6 +77,11 @@ RUN tar xf kernel-dev.tar && rm kernel-dev.tar \
 
 COPY --from=build /out/perf /usr/bin/perf
 
+RUN wget -O - https://raw.githubusercontent.com/brendangregg/bpf-perf-tools-book/master/originals/Ch13_Applications/pmlock.bt | sed -e 's|#!/usr/local/bin/bpftrace|#!/usr/bin/bpftrace|g' -e 's/x86_64-linux-gnu/aarch64-linux-gnu/g' > /usr/local/bin/pmlock.bt \
+ && chmod +x /usr/local/bin/pmlock.bt
+RUN wget -O - https://raw.githubusercontent.com/brendangregg/bpf-perf-tools-book/master/originals/Ch13_Applications/pmheld.bt | sed -e 's|#!/usr/local/bin/bpftrace|#!/usr/bin/bpftrace|g' -e 's/x86_64-linux-gnu/aarch64-linux-gnu/g' > /usr/local/bin/pmheld.bt \
+ && chmod +x /usr/local/bin/pmheld.bt
+
 # Allow ptrace(2) to attach to processes.
 RUN sed -i 's/^kernel.yama.ptrace_scope = 1$/kernel.yama.ptrace_scope = 0/g' /etc/sysctl.d/10-ptrace.conf
 
