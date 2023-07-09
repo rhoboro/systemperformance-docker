@@ -85,6 +85,11 @@ RUN wget -O - https://raw.githubusercontent.com/brendangregg/bpf-perf-tools-book
 # Allow ptrace(2) to attach to processes.
 RUN sed -i 's/^kernel.yama.ptrace_scope = 1$/kernel.yama.ptrace_scope = 0/g' /etc/sysctl.d/10-ptrace.conf
 
+# Enable sar
+RUN sed -i 's/^ENABLED="false"$/ENABLED="true"/g' /etc/default/sysstat \
+ && sed -i 's|^5-55/10 * * * * root command -v debian-sa1 > /dev/null && debian-sa1 1 1$|*/5 * * * * root command -v debian-sa1 > /dev/null && debian-sa1 1 1 -S ALL|g' /etc/cron.d/sysstat \
+ && service sysstat restart
+
 WORKDIR /root
 
 # echo 0 > /proc/sys/kernel/kptr_restrict
