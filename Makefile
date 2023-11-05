@@ -21,7 +21,7 @@ run:
   --net=host \
   --pid=host \
   --security-opt seccomp=profile.json \
-  sysperf:0.1 /bin/bash
+  ${IMAGE} /bin/bash
 
 exec:
 	docker exec -it $$(docker ps --filter "name=${NAME}" -q) /bin/bash
