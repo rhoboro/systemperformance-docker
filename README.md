@@ -13,7 +13,6 @@ Running on...
 
 ```bash
 $ make build
-$ make debugfs
 $ make run
 
 # Atatch to the container

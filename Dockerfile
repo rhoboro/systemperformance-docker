@@ -1,3 +1,27 @@
+FROM ubuntu:23.04 AS pythonbuilder
+
+RUN apt update && apt install -y \
+  build-essential \
+  libbz2-dev \
+  libdb-dev \
+  libffi-dev \
+  libgdbm-dev \
+  liblzma-dev \
+  libncursesw5-dev \
+  libreadline-dev \
+  libsqlite3-dev \
+  libssl-dev \
+  # tkinter を使う場合は必要
+  # tk-dev \
+  uuid-dev \
+  wget \
+  zlib1g-dev
+
+RUN cd /tmp && wget https://www.python.org/ftp/python/3.12.1/Python-3.12.1.tar.xz -O - | tar xJf -
+
+# /usr/local/binにpython3とpython3.xコマンドがインストールされる
+RUN cd /tmp/Python-3.12.1 && ./configure && make && make install
+
 # https://github.com/linuxkit/linuxkit/blob/master/docs/kernels.md
 # https://github.com/linuxkit/linuxkit/blob/master/kernel/Dockerfile.perf
 FROM linuxkit/kernel:5.15.27 AS ksrc
@@ -73,7 +97,8 @@ WORKDIR /
 COPY --from=ksrc /kernel-dev.tar /
 # It is unclear how much this version mismatch affects the results.
 RUN tar xf kernel-dev.tar && rm kernel-dev.tar \
- && ln -s /usr/src/linux-headers-5.15.27-linuxkit /usr/src/linux-headers-5.15.49-linuxkit
+ && ln -s /usr/src/linux-headers-5.15.27-linuxkit /usr/src/linux-headers-5.15.49-linuxkit \
+ && ln -s /usr/src/linux-headers-5.15.27-linuxkit /usr/src/linux-headers-5.15.0-87-generic
 
 COPY --from=build /out/perf /usr/bin/perf
 
@@ -91,5 +116,7 @@ RUN sed -i 's/^ENABLED="false"$/ENABLED="true"/g' /etc/default/sysstat \
  && service sysstat restart
 
 WORKDIR /root
+
+COPY --from=pythonbuilder /usr/local /usr/local
 
 # echo 0 > /proc/sys/kernel/kptr_restrict
